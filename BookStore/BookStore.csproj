@@ -53,6 +53,12 @@
     <Compile Include="menu_form.Designer.cs">
       <DependentUpon>menu_form.cs</DependentUpon>
     </Compile>
+    <Compile Include="book_form\book_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="book_form\book_form.Designer.cs">
+      <DependentUpon>book_form.cs</DependentUpon>
+    </Compile>
     <Compile Include="order_form\order_form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,6 +67,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="book_form\book_form.resx">
+      <DependentUpon>book_form.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="menu_form.resx">
       <DependentUpon>menu_form.cs</DependentUpon>
     </EmbeddedResource>
