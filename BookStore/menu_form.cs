@@ -16,5 +16,22 @@ namespace BookStore
         {
             InitializeComponent();
         }
+
+        private void Place_Order_button_Click(object sender, EventArgs e)
+        {
+            // open order window
+            BookStoreForm f = new BookStoreForm();
+            f.Show();
+        }
+
+        private void Manage_Books_button_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Manage_Customers_button_Click(object sender, EventArgs e)
+        {
+            
+        }
     }
 }

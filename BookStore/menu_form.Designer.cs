@@ -69,6 +69,7 @@
             this.Manage_Customers_button.TabIndex = 0;
             this.Manage_Customers_button.Text = "Manage Customers";
             this.Manage_Customers_button.UseVisualStyleBackColor = true;
+            this.Manage_Customers_button.Click += new System.EventHandler(this.Manage_Customers_button_Click);
             // 
             // Manage_Books_button
             // 
@@ -78,6 +79,7 @@
             this.Manage_Books_button.TabIndex = 1;
             this.Manage_Books_button.Text = "Manage Books";
             this.Manage_Books_button.UseVisualStyleBackColor = true;
+            this.Manage_Books_button.Click += new System.EventHandler(this.Manage_Books_button_Click);
             // 
             // Place_Order_button
             // 
@@ -87,6 +89,7 @@
             this.Place_Order_button.TabIndex = 2;
             this.Place_Order_button.Text = "Place Order";
             this.Place_Order_button.UseVisualStyleBackColor = true;
+            this.Place_Order_button.Click += new System.EventHandler(this.Place_Order_button_Click);
             // 
             // Menu_Form
             // 
