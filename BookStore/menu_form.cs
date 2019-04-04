@@ -27,9 +27,13 @@ namespace BookStore
 
         private void Manage_Books_button_Click(object sender, EventArgs e)
         {
-            // open book window
-            Book_Window_form books = new Book_Window_form();
-            books.Show();
+            // hide main form
+            this.Hide();
+
+            // show other form
+            var Books = new Book_Window_form();
+            Books.RefToForm1 = this;
+            Books.ShowDialog();
         }
 
         private void Manage_Customers_button_Click(object sender, EventArgs e)
