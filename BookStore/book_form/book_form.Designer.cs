@@ -37,13 +37,13 @@
             this.Cancel_button = new System.Windows.Forms.Button();
             this.Books_comboBox = new System.Windows.Forms.ComboBox();
             this.Title_label = new System.Windows.Forms.Label();
-            this.Author_button = new System.Windows.Forms.Label();
-            this.ISBN_button = new System.Windows.Forms.Label();
+            this.Author_label = new System.Windows.Forms.Label();
+            this.ISBN_label = new System.Windows.Forms.Label();
             this.Price_label = new System.Windows.Forms.Label();
-            this.Title_box = new System.Windows.Forms.TextBox();
-            this.Author_box = new System.Windows.Forms.TextBox();
-            this.ISBN_box = new System.Windows.Forms.TextBox();
-            this.Price_box = new System.Windows.Forms.TextBox();
+            this.Title_text = new System.Windows.Forms.TextBox();
+            this.Author_text = new System.Windows.Forms.TextBox();
+            this.ISBN_text = new System.Windows.Forms.TextBox();
+            this.Price_text = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,13 +60,13 @@
             this.tableLayoutPanel1.Controls.Add(this.Cancel_button, 2, 3);
             this.tableLayoutPanel1.Controls.Add(this.Books_comboBox, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.Title_label, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.Author_button, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.ISBN_button, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.Author_label, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.ISBN_label, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.Price_label, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.Title_box, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.Author_box, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.ISBN_box, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.Price_box, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.Title_text, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.Author_text, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.ISBN_text, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.Price_text, 1, 4);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 12);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -125,6 +125,7 @@
             this.New_Book_button.Text = "New Book";
             this.New_Book_button.UseCompatibleTextRendering = true;
             this.New_Book_button.UseVisualStyleBackColor = true;
+            this.New_Book_button.Click += new System.EventHandler(this.New_Book_button_Click);
             // 
             // Save_button
             // 
@@ -140,6 +141,7 @@
             this.Save_button.Text = "Save";
             this.Save_button.UseCompatibleTextRendering = true;
             this.Save_button.UseVisualStyleBackColor = true;
+            this.Save_button.Click += new System.EventHandler(this.Save_button_Click);
             // 
             // Cancel_button
             // 
@@ -155,6 +157,7 @@
             this.Cancel_button.Text = "Cancel";
             this.Cancel_button.UseCompatibleTextRendering = true;
             this.Cancel_button.UseVisualStyleBackColor = true;
+            this.Cancel_button.Click += new System.EventHandler(this.Cancel_button_Click);
             // 
             // Books_comboBox
             // 
@@ -167,6 +170,7 @@
             this.Books_comboBox.Name = "Books_comboBox";
             this.Books_comboBox.Size = new System.Drawing.Size(476, 24);
             this.Books_comboBox.TabIndex = 4;
+            this.Books_comboBox.SelectedIndexChanged += new System.EventHandler(this.Books_comboBox_SelectedIndexChanged);
             // 
             // Title_label
             // 
@@ -183,35 +187,35 @@
             this.Title_label.Text = "Title:";
             this.Title_label.UseCompatibleTextRendering = true;
             // 
-            // Author_button
+            // Author_label
             // 
-            this.Author_button.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.Author_label.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Author_button.AutoSize = true;
-            this.Author_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Author_button.Location = new System.Drawing.Point(12, 144);
-            this.Author_button.Margin = new System.Windows.Forms.Padding(12, 18, 12, 18);
-            this.Author_button.Name = "Author_button";
-            this.Author_button.Size = new System.Drawing.Size(92, 27);
-            this.Author_button.TabIndex = 6;
-            this.Author_button.Text = "Author";
-            this.Author_button.UseCompatibleTextRendering = true;
+            this.Author_label.AutoSize = true;
+            this.Author_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Author_label.Location = new System.Drawing.Point(12, 144);
+            this.Author_label.Margin = new System.Windows.Forms.Padding(12, 18, 12, 18);
+            this.Author_label.Name = "Author_label";
+            this.Author_label.Size = new System.Drawing.Size(92, 27);
+            this.Author_label.TabIndex = 6;
+            this.Author_label.Text = "Author";
+            this.Author_label.UseCompatibleTextRendering = true;
             // 
-            // ISBN_button
+            // ISBN_label
             // 
-            this.ISBN_button.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.ISBN_label.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ISBN_button.AutoSize = true;
-            this.ISBN_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ISBN_button.Location = new System.Drawing.Point(12, 207);
-            this.ISBN_button.Margin = new System.Windows.Forms.Padding(12, 18, 12, 18);
-            this.ISBN_button.Name = "ISBN_button";
-            this.ISBN_button.Size = new System.Drawing.Size(92, 27);
-            this.ISBN_button.TabIndex = 7;
-            this.ISBN_button.Text = "ISBN:";
-            this.ISBN_button.UseCompatibleTextRendering = true;
+            this.ISBN_label.AutoSize = true;
+            this.ISBN_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ISBN_label.Location = new System.Drawing.Point(12, 207);
+            this.ISBN_label.Margin = new System.Windows.Forms.Padding(12, 18, 12, 18);
+            this.ISBN_label.Name = "ISBN_label";
+            this.ISBN_label.Size = new System.Drawing.Size(92, 27);
+            this.ISBN_label.TabIndex = 7;
+            this.ISBN_label.Text = "ISBN:";
+            this.ISBN_label.UseCompatibleTextRendering = true;
             // 
             // Price_label
             // 
@@ -228,49 +232,50 @@
             this.Price_label.Text = "Price:";
             this.Price_label.UseCompatibleTextRendering = true;
             // 
-            // Title_box
+            // Title_text
             // 
-            this.Title_box.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.Title_text.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Title_box.Location = new System.Drawing.Point(128, 81);
-            this.Title_box.Margin = new System.Windows.Forms.Padding(12, 18, 12, 18);
-            this.Title_box.Name = "Title_box";
-            this.Title_box.Size = new System.Drawing.Size(476, 22);
-            this.Title_box.TabIndex = 9;
+            this.Title_text.Location = new System.Drawing.Point(128, 81);
+            this.Title_text.Margin = new System.Windows.Forms.Padding(12, 18, 12, 18);
+            this.Title_text.Name = "Title_text";
+            this.Title_text.Size = new System.Drawing.Size(476, 22);
+            this.Title_text.TabIndex = 9;
             // 
-            // Author_box
+            // Author_text
             // 
-            this.Author_box.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.Author_text.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Author_box.Location = new System.Drawing.Point(128, 144);
-            this.Author_box.Margin = new System.Windows.Forms.Padding(12, 18, 200, 18);
-            this.Author_box.Name = "Author_box";
-            this.Author_box.Size = new System.Drawing.Size(288, 22);
-            this.Author_box.TabIndex = 10;
+            this.Author_text.Location = new System.Drawing.Point(128, 144);
+            this.Author_text.Margin = new System.Windows.Forms.Padding(12, 18, 200, 18);
+            this.Author_text.Name = "Author_text";
+            this.Author_text.Size = new System.Drawing.Size(288, 22);
+            this.Author_text.TabIndex = 10;
             // 
-            // ISBN_box
+            // ISBN_text
             // 
-            this.ISBN_box.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.ISBN_text.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ISBN_box.Location = new System.Drawing.Point(128, 207);
-            this.ISBN_box.Margin = new System.Windows.Forms.Padding(12, 18, 200, 18);
-            this.ISBN_box.Name = "ISBN_box";
-            this.ISBN_box.Size = new System.Drawing.Size(288, 22);
-            this.ISBN_box.TabIndex = 11;
+            this.ISBN_text.Location = new System.Drawing.Point(128, 207);
+            this.ISBN_text.Margin = new System.Windows.Forms.Padding(12, 18, 200, 18);
+            this.ISBN_text.Name = "ISBN_text";
+            this.ISBN_text.Size = new System.Drawing.Size(288, 22);
+            this.ISBN_text.TabIndex = 11;
             // 
-            // Price_box
+            // Price_text
             // 
-            this.Price_box.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.Price_text.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Price_box.Location = new System.Drawing.Point(128, 270);
-            this.Price_box.Margin = new System.Windows.Forms.Padding(12, 18, 300, 18);
-            this.Price_box.Name = "Price_box";
-            this.Price_box.Size = new System.Drawing.Size(188, 22);
-            this.Price_box.TabIndex = 12;
+            this.Price_text.Location = new System.Drawing.Point(128, 270);
+            this.Price_text.Margin = new System.Windows.Forms.Padding(12, 18, 300, 18);
+            this.Price_text.Name = "Price_text";
+            this.Price_text.Size = new System.Drawing.Size(188, 22);
+            this.Price_text.TabIndex = 12;
+            this.Price_text.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Price_text_KeyPress);
             // 
             // Book_Window_form
             // 
@@ -300,13 +305,13 @@
         private System.Windows.Forms.Button Cancel_button;
         private System.Windows.Forms.ComboBox Books_comboBox;
         private System.Windows.Forms.Label Title_label;
-        private System.Windows.Forms.Label Author_button;
-        private System.Windows.Forms.Label ISBN_button;
+        private System.Windows.Forms.Label Author_label;
+        private System.Windows.Forms.Label ISBN_label;
         private System.Windows.Forms.Label Price_label;
-        private System.Windows.Forms.TextBox Title_box;
-        private System.Windows.Forms.TextBox Author_box;
-        private System.Windows.Forms.TextBox ISBN_box;
-        private System.Windows.Forms.TextBox Price_box;
+        private System.Windows.Forms.TextBox Title_text;
+        private System.Windows.Forms.TextBox Author_text;
+        private System.Windows.Forms.TextBox ISBN_text;
+        private System.Windows.Forms.TextBox Price_text;
         private System.Windows.Forms.Label label1;
     }
 }
