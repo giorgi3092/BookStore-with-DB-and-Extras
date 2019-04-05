@@ -95,34 +95,50 @@ namespace BookStore.order_form
             Price_text.Text = PriceDelimiter(Price_text.Text);
             if (!(Books_comboBox.SelectedItem == null) && NewBookClicked == false)
             {
-                try
+                DialogResult dialogResult = MessageBox.Show("Are you sure?", "Confirm", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
                 {
-                    // update book entry
-                    UpdateBooksTable(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[Books_comboBox.SelectedIndex].ToString()));
+                    try
+                    {
+                        // update book entry
+                        UpdateBooksTable(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[Books_comboBox.SelectedIndex].ToString()));
 
-                    // verify book entry
-                    if (VerifyUpdatedBookEntry(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[Books_comboBox.SelectedIndex].ToString())))
-                        MessageBox.Show("Updated successfully");
-                    else
-                        MessageBox.Show("Update failed. Data not sent to the database");
+                        // verify book entry
+                        if (VerifyUpdatedBookEntry(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[Books_comboBox.SelectedIndex].ToString())))
+                            MessageBox.Show("Updated successfully");
+                        else
+                            MessageBox.Show("Update failed. Data not sent to the database");
 
+                    }
+                    catch (System.FormatException ex)
+                    {
+                        MessageBox.Show(ex.Message + " Please make sure you are using valid characters");
+                    }
                 }
-                catch (System.FormatException ex)
+                else if (dialogResult == DialogResult.No)
                 {
-                    MessageBox.Show(ex.Message + " Please make sure you are using valid characters");
+                    //do something else
                 }
             } else if(NewBookClicked == true)
             {
-                try
+                DialogResult dialogResult = MessageBox.Show("Are you sure?", "Confirm", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
                 {
-                    // insert book entry
-                    InsertIntoBooksTable(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text));
+                    try
+                    {
+                        // insert book entry
+                        InsertIntoBooksTable(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text));
 
-                    // Possible extra TO-DO: verify book insertion
+                        // Possible extra TO-DO: verify book insertion
+                    }
+                    catch (System.FormatException ex)
+                    {
+                        MessageBox.Show(ex.Message + " Please make sure you are using valid characters");
+                    }
                 }
-                catch (System.FormatException ex)
+                else if (dialogResult == DialogResult.No)
                 {
-                    MessageBox.Show(ex.Message + " Please make sure you are using valid characters");
+                    //do something else
                 }
             } else
                 MessageBox.Show("Something went wrong. Check your entries.");
@@ -135,8 +151,43 @@ namespace BookStore.order_form
         /// <param name="e"></param>
         private void Cancel_button_Click(object sender, EventArgs e)
         {
+            DialogResult dialogResult = MessageBox.Show("Are you sure?", "Confirm", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                int SelectedIndexTemp = Books_comboBox.SelectedIndex;
+                try
+                {
+                    if (!VerifyUpdatedBookEntry(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[SelectedIndexTemp].ToString())))
+                    {
+                        Books_comboBox.Items.Clear();
+                        RetrievedBooks.Clear();
+                        IDStorage.Clear();
+                        Connect_DB_and_Populate();
+
+                        Title_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["title"].ToString();
+                        Author_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["author"].ToString();
+                        ISBN_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["isbn"].ToString();
+                        Price_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["price"].ToString();
+                        Books_comboBox.SelectedIndex = SelectedIndexTemp;
+                    }
+                } catch(FormatException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                catch (IndexOutOfRangeException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            }
+            else if (dialogResult == DialogResult.No)
+            {
+                //do something else
+            }
 
         }
+
+        
 
         #endregion
 
@@ -351,8 +402,12 @@ namespace BookStore.order_form
             }
             return false;
         }
-        #endregion
 
+        /// <summary>
+        /// Makes sure only '.' or ',' characters are allowed in price text box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Price_text_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar)
@@ -402,5 +457,6 @@ namespace BookStore.order_form
             }
 
         }
+        #endregion
     }
 }
