@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * NOTE: this form was copied from book_form.cs so it contains misleading comments. Yet, functionality is exactly the same as book form's
+ * */
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,19 +16,19 @@ using System.Collections;
 
 namespace BookStore.order_form
 {
-    public partial class Book_Window_form : Form
+    public partial class customer_form : Form
     {
         #region Fields
         // reference to calling form
         public Form RefToForm1 { get; set; }
 
-        // retrieved books
-        private DataSet RetrievedBooks = new DataSet();
+        // retrieved customers
+        private DataSet RetrievedCustomers = new DataSet();
 
-        // "New Book" clicked
-        private bool NewBookClicked = new bool();
+        // "New Customer" clicked
+        private bool NewCustomerClicked = new bool();
 
-        // Books DB ID storage
+        // Customers DB ID storage
         private ArrayList IDStorage { get; set; }
         #endregion
 
@@ -32,7 +36,7 @@ namespace BookStore.order_form
         /// <summary>
         /// default constructor of the form
         /// </summary>
-        public Book_Window_form()
+        public customer_form()
         {
             InitializeComponent();
         }
@@ -40,11 +44,11 @@ namespace BookStore.order_form
 
         #region Form Load, Closing events
         /// <summary>
-        /// Populate the combobox when the main BookStoreForm form loads
+        /// Populate the combobox when the main customer_form form loads
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Book_Window_form_Load(object sender, EventArgs e)
+        private void customer_form_Load(object sender, EventArgs e)
         {
             // establish connection to the database and populate combobox
             Connect_DB_and_Populate();
@@ -56,7 +60,7 @@ namespace BookStore.order_form
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Book_Window_form_FormClosing(object sender, FormClosingEventArgs e)
+        private void customer_form_FormClosing(object sender, FormClosingEventArgs e)
         {
             this.RefToForm1.Show();
         }
@@ -74,15 +78,15 @@ namespace BookStore.order_form
         }
 
         /// <summary>
-        /// New Book
+        /// New Customer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void New_Book_button_Click(object sender, EventArgs e)
+        private void New_customer_button_button_Click(object sender, EventArgs e)
         {
             ClearTextFields();
-            Books_comboBox.Enabled = false;
-            NewBookClicked = true;
+            customers_comboBox.Enabled = false;
+            NewCustomerClicked = true;
         }
 
         /// <summary>
@@ -92,8 +96,7 @@ namespace BookStore.order_form
         /// <param name="e"></param>
         private void Save_button_Click(object sender, EventArgs e)
         {
-            Price_text.Text = PriceDelimiter(Price_text.Text);
-            if (!(Books_comboBox.SelectedItem == null) && NewBookClicked == false)
+            if (!(customers_comboBox.SelectedItem == null) && NewCustomerClicked == false)
             {
                 DialogResult dialogResult = MessageBox.Show("Are you sure?", "Confirm", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
@@ -101,10 +104,10 @@ namespace BookStore.order_form
                     try
                     {
                         // update book entry
-                        UpdateBooksTable(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[Books_comboBox.SelectedIndex].ToString()));
+                        UpdateCustomersTable(First_Name_text.Text, Last_name_text.Text, Address_text.Text, City_text.Text, States_text.Text, ZIP_text.Text, Phone_text.Text, Email_text.Text, int.Parse(IDStorage[customers_comboBox.SelectedIndex].ToString()));
 
                         // verify book entry
-                        if (VerifyUpdatedBookEntry(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[Books_comboBox.SelectedIndex].ToString())))
+                        if (VerifyUpdatedBookEntry(First_Name_text.Text, Last_name_text.Text, Address_text.Text, City_text.Text, States_text.Text, ZIP_text.Text, Phone_text.Text, Email_text.Text, int.Parse(IDStorage[customers_comboBox.SelectedIndex].ToString())))
                             MessageBox.Show("Updated successfully");
                         else
                             MessageBox.Show("Update failed. Data not sent to the database");
@@ -119,7 +122,7 @@ namespace BookStore.order_form
                 {
                     //do something else
                 }
-            } else if(NewBookClicked == true)
+            } else if(NewCustomerClicked == true)
             {
                 DialogResult dialogResult = MessageBox.Show("Are you sure?", "Confirm", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
@@ -127,7 +130,7 @@ namespace BookStore.order_form
                     try
                     {
                         // insert book entry
-                        InsertIntoBooksTable(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text));
+                        InsertIntoBooksTable(First_Name_text.Text, Last_name_text.Text, Address_text.Text, City_text.Text, States_text.Text, ZIP_text.Text, Phone_text.Text, Email_text.Text);
 
                         // Possible extra TO-DO: verify book insertion
                     }
@@ -154,21 +157,18 @@ namespace BookStore.order_form
             DialogResult dialogResult = MessageBox.Show("Are you sure?", "Confirm", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
-                int SelectedIndexTemp = Books_comboBox.SelectedIndex;
+                int SelectedIndexTemp = customers_comboBox.SelectedIndex;
                 try
                 {
-                    if (!VerifyUpdatedBookEntry(Title_text.Text, Author_text.Text, ISBN_text.Text, decimal.Parse(Price_text.Text), int.Parse(IDStorage[SelectedIndexTemp].ToString())))
+                    if (!VerifyUpdatedBookEntry(First_Name_text.Text, Last_name_text.Text, Address_text.Text, City_text.Text, States_text.Text, ZIP_text.Text, Phone_text.Text, Email_text.Text, int.Parse(IDStorage[SelectedIndexTemp].ToString())))
                     {
-                        Books_comboBox.Items.Clear();
-                        RetrievedBooks.Clear();
+                        customers_comboBox.Items.Clear();
+                        RetrievedCustomers.Clear();
                         IDStorage.Clear();
                         Connect_DB_and_Populate();
 
-                        Title_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["title"].ToString();
-                        Author_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["author"].ToString();
-                        ISBN_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["isbn"].ToString();
-                        Price_text.Text = RetrievedBooks.Tables[0].Rows[SelectedIndexTemp]["price"].ToString();
-                        Books_comboBox.SelectedIndex = SelectedIndexTemp;
+                        FillTextFields(SelectedIndexTemp);
+                        customers_comboBox.SelectedIndex = SelectedIndexTemp;
                     }
                 } catch(FormatException ex)
                 {
@@ -211,14 +211,14 @@ namespace BookStore.order_form
             {
                 string con_string = "datasource = localhost; username = root; password =; database=bookstore";
                 MySqlConnection db_con = new MySqlConnection(con_string);
-                MySqlDataAdapter da = new MySqlDataAdapter("select * from books ORDER BY book_id ASC", db_con);
+                MySqlDataAdapter da = new MySqlDataAdapter("select * from customer ORDER BY customer_id ASC", db_con);
                 db_con.Open();
                 IDStorage = new ArrayList();
-                da.Fill(RetrievedBooks, "books");
-                for (int i = 0; i < RetrievedBooks.Tables[0].Rows.Count; i++)
+                da.Fill(RetrievedCustomers, "customer");
+                for (int i = 0; i < RetrievedCustomers.Tables[0].Rows.Count; i++)
                 {
-                    Books_comboBox.Items.Add(RetrievedBooks.Tables[0].Rows[i]["title"].ToString());
-                    IDStorage.Add(RetrievedBooks.Tables[0].Rows[i]["book_id"].ToString());
+                    customers_comboBox.Items.Add(RetrievedCustomers.Tables[0].Rows[i]["first_name"].ToString() + " " + RetrievedCustomers.Tables[0].Rows[i]["last_name"].ToString());
+                    IDStorage.Add(RetrievedCustomers.Tables[0].Rows[i]["customer_id"].ToString());
                 }
                 db_con.Close();
             }
@@ -236,16 +236,21 @@ namespace BookStore.order_form
         /// <param name="author"></param>
         /// <param name="isbn"></param>
         /// <param name="price"></param>
-        private void UpdateBooksTable(string title, string author, string isbn, decimal price, int ID)
+        private void UpdateCustomersTable(string first_name, string last_name, string address, string city, string states, string ZIP, string phone, string email, int ID)
         {
-            title = ReplaceEscSequences(title);
-            author = ReplaceEscSequences(author);
-            isbn = ReplaceEscSequences(isbn);
+            first_name = ReplaceEscSequences(first_name);
+            last_name = ReplaceEscSequences(last_name);
+            address = ReplaceEscSequences(address);
+            city = ReplaceEscSequences(city);
+            states = ReplaceEscSequences(states);
+            ZIP = ReplaceEscSequences(ZIP);
+            phone = ReplaceEscSequences(phone);
+            email = ReplaceEscSequences(email);
 
             try
             {
                 string MyConnection3 = "datasource=localhost;username=root;passwor=;database=bookstore";
-                string Query = @"UPDATE books SET title='"+ title + @"', author='" + author + @"', isbn='" + isbn + @"', price=" + price + @" WHERE book_id = " + ID + @";";
+                string Query = @"UPDATE customer SET first_name='" + first_name + @"', last_name='" + last_name + @"', address='" + address + @"', city='" + city + @"', states='" + states + @"', zip='" + ZIP + @"', home_phone='" + phone + @"', email='" + email + @"' WHERE customer_id = " + ID + @";";
                 MySqlConnection MyConn2 = new MySqlConnection(MyConnection3);
                 MySqlCommand MyCommand2 = new MySqlCommand(Query, MyConn2);
                 MyConn2.Open();
@@ -271,16 +276,21 @@ namespace BookStore.order_form
         /// <param name="author"></param>
         /// <param name="isbn"></param>
         /// <param name="price"></param>
-        private void InsertIntoBooksTable(string title, string author, string isbn, decimal price)
+        private void InsertIntoBooksTable(string first_name, string last_name, string address, string city, string states, string ZIP, string phone, string email)
         {
-            title = ReplaceEscSequences(title);
-            author = ReplaceEscSequences(author);
-            isbn = ReplaceEscSequences(isbn);
+            first_name = ReplaceEscSequences(first_name);
+            last_name = ReplaceEscSequences(last_name);
+            address = ReplaceEscSequences(address);
+            city = ReplaceEscSequences(city);
+            states = ReplaceEscSequences(states);
+            ZIP = ReplaceEscSequences(ZIP);
+            phone = ReplaceEscSequences(phone);
+            email = ReplaceEscSequences(email);
 
             try
             {
                 string MyConnection3 = "datasource=localhost;username=root;passwor=;database=bookstore";
-                string Query = @"INSERT INTO books(title, author, isbn, price) VALUES ('"+ title +@"', '"+ author +@"', '"+ isbn+ @"', '"+ price +@"');";
+                string Query = @"INSERT INTO customer(first_name, last_name, address, city, states, ZIP, home_phone, email) VALUES ('" + first_name + @"', '"+ last_name + @"', '"+ address + @"', '" + city + @"',  '" + states + @"',  '" + ZIP + @"',  '" + phone + @"',  '" + email + @"');";
                 MySqlConnection MyConn2 = new MySqlConnection(MyConnection3);
                 MySqlCommand MyCommand2 = new MySqlCommand(Query, MyConn2);
                 MyConn2.Open();
@@ -305,7 +315,7 @@ namespace BookStore.order_form
         /// <param name="author"></param>
         /// <param name="isbn"></param>
         /// <param name="price"></param>
-        private bool VerifyUpdatedBookEntry(string title, string author, string isbn, decimal price, int ID)
+        private bool VerifyUpdatedBookEntry(string first_name, string last_name, string address, string city, string states, string ZIP, string phone, string email, int ID)
         {
             bool AllFine = false;
 
@@ -313,15 +323,19 @@ namespace BookStore.order_form
             {
                 string con_string = "datasource = localhost; username = root; password =; database=bookstore";
                 MySqlConnection db_con = new MySqlConnection(con_string);
-                MySqlDataAdapter da = new MySqlDataAdapter("select * from books WHERE book_id = " + ID + @";", db_con);
+                MySqlDataAdapter da = new MySqlDataAdapter("select * from customer WHERE customer_id = " + ID + @";", db_con);
                 db_con.Open();
                 DataSet ds = new DataSet();
 
                 da.Fill(ds, "books");
-                if (string.Compare(ds.Tables[0].Rows[0]["title"].ToString(), title) == 0 &&
-                    string.Compare(ds.Tables[0].Rows[0]["author"].ToString(), author) == 0 &&
-                    string.Compare(ds.Tables[0].Rows[0]["isbn"].ToString(), isbn) == 0 &&
-                    string.Compare(ds.Tables[0].Rows[0]["price"].ToString(), price.ToString()) == 0)
+                if (string.Compare(ds.Tables[0].Rows[0]["first_name"].ToString(), first_name) == 0 &&
+                    string.Compare(ds.Tables[0].Rows[0]["last_name"].ToString(), last_name) == 0 &&
+                    string.Compare(ds.Tables[0].Rows[0]["address"].ToString(), address) == 0 &&
+                    string.Compare(ds.Tables[0].Rows[0]["city"].ToString(), city) == 0 &&
+                    string.Compare(ds.Tables[0].Rows[0]["states"].ToString(), states) == 0 &&
+                    string.Compare(ds.Tables[0].Rows[0]["ZIP"].ToString(), ZIP) == 0 &&
+                    string.Compare(ds.Tables[0].Rows[0]["home_phone"].ToString(), phone) == 0 &&
+                    string.Compare(ds.Tables[0].Rows[0]["email"].ToString(), email) == 0) 
                     AllFine = true;
                 
                 db_con.Close();
@@ -339,10 +353,30 @@ namespace BookStore.order_form
         /// </summary>
         private void FillTextFields()
         {
-            Title_text.Text = RetrievedBooks.Tables[0].Rows[Books_comboBox.SelectedIndex]["title"].ToString();
-            Author_text.Text = RetrievedBooks.Tables[0].Rows[Books_comboBox.SelectedIndex]["author"].ToString();
-            ISBN_text.Text = RetrievedBooks.Tables[0].Rows[Books_comboBox.SelectedIndex]["isbn"].ToString();
-            Price_text.Text = RetrievedBooks.Tables[0].Rows[Books_comboBox.SelectedIndex]["price"].ToString();
+            int SelectedIndexTemp = customers_comboBox.SelectedIndex;
+            First_Name_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["first_name"].ToString();
+            Last_name_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["last_name"].ToString();
+            Address_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["address"].ToString();
+            City_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["city"].ToString();
+            States_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["states"].ToString();
+            ZIP_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["zip"].ToString();
+            Phone_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["home_phone"].ToString();
+            Email_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["email"].ToString();
+        }
+
+        /// <summary>
+        /// Fills available text fields with the selected book from the combobox
+        /// </summary>
+        private void FillTextFields(int SelectedIndexTemp)
+        {
+            First_Name_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["first_name"].ToString();
+            Last_name_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["last_name"].ToString();
+            Address_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["address"].ToString();
+            City_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["city"].ToString();
+            States_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["states"].ToString();
+            ZIP_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["zip"].ToString();
+            Phone_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["home_phone"].ToString();
+            Email_text.Text = RetrievedCustomers.Tables[0].Rows[SelectedIndexTemp]["email"].ToString();
         }
 
         /// <summary>
@@ -350,10 +384,14 @@ namespace BookStore.order_form
         /// </summary>
         private void ClearTextFields()
         {
-            Title_text.Clear();
-            Author_text.Clear();
-            ISBN_text.Clear();
-            Price_text.Clear();
+            First_Name_text.Clear();
+            Last_name_text.Clear();
+            Address_text.Clear();
+            City_text.Clear();
+            States_text.Clear();
+            ZIP_text.Clear();
+            Phone_text.Clear();
+            Email_text.Clear();
         }
 
         /// <summary>
@@ -366,93 +404,6 @@ namespace BookStore.order_form
             value = value.Replace(@"'", @"''");
             value = value.Replace(@"\", @"\\");
             return value;
-        }
-
-        /// <summary>
-        /// For price, ',' and '.' are same
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private string PriceDelimiter(string value)
-        {
-            value = value.Replace(@",", @".");
-            return value;
-        }
-
-        /// <summary>
-        /// used for price text box to disallow certain characters
-        /// </summary>
-        /// <param name="_text"></param>
-        /// <param name="KeyChar"></param>
-        /// <returns></returns>
-        private bool alreadyExist(string _text, ref char KeyChar)
-        {
-            if (_text.IndexOf('.') > -1)
-            {
-                KeyChar = '.';
-                return true;
-            }
-            if (_text.IndexOf(',') > -1)
-            {
-                KeyChar = ',';
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Makes sure only '.' or ',' characters are allowed in price text box
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Price_text_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar)
-                    && !char.IsDigit(e.KeyChar)
-                    && e.KeyChar != '.' && e.KeyChar != ',')
-            {
-                e.Handled = true;
-            }
-
-            //check if '.' , ',' pressed
-            char sepratorChar = 's';
-            if (e.KeyChar == '.' || e.KeyChar == ',')
-            {
-                // check if it's in the beginning of text not accept
-                if (Price_text.Text.Length == 0) e.Handled = true;
-                // check if it's in the beginning of text not accept
-                if (Price_text.SelectionStart == 0) e.Handled = true;
-                // check if there is already exist a '.' , ','
-                if (alreadyExist(Price_text.Text, ref sepratorChar)) e.Handled = true;
-                //check if '.' or ',' is in middle of a number and after it is not a number greater than 99
-                if (Price_text.SelectionStart != Price_text.Text.Length && e.Handled == false)
-                {
-                    // '.' or ',' is in the middle
-                    string AfterDotString = Price_text.Text.Substring(Price_text.SelectionStart);
-
-                    if (AfterDotString.Length > 2)
-                    {
-                        e.Handled = true;
-                    }
-                }
-            }
-            //check if a number pressed
-
-            if (Char.IsDigit(e.KeyChar))
-            {
-                //check if a coma or dot exist
-                if (alreadyExist(Price_text.Text, ref sepratorChar))
-                {
-                    int sepratorPosition = Price_text.Text.IndexOf(sepratorChar);
-                    string afterSepratorString = Price_text.Text.Substring(sepratorPosition + 1);
-                    if (Price_text.SelectionStart > sepratorPosition && afterSepratorString.Length > 1)
-                    {
-                        e.Handled = true;
-                    }
-
-                }
-            }
-
         }
         #endregion
     }

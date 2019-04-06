@@ -21,8 +21,13 @@ namespace BookStore
         private void Place_Order_button_Click(object sender, EventArgs e)
         {
             // open order window
-            BookStoreForm orders = new BookStoreForm();
-            orders.Show();
+            // hide main form
+            this.Hide();
+
+            // show other form
+            var Books = new BookStoreForm();
+            Books.RefToForm1 = this;
+            Books.ShowDialog();
         }
 
         private void Manage_Books_button_Click(object sender, EventArgs e)
@@ -38,7 +43,13 @@ namespace BookStore
 
         private void Manage_Customers_button_Click(object sender, EventArgs e)
         {
-            
+            // hide main form
+            this.Hide();
+
+            // show other form
+            var Books = new customer_form();
+            Books.RefToForm1 = this;
+            Books.ShowDialog();
         }
     }
 }

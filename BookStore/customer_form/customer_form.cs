@@ -12,7 +12,7 @@ using System.Collections;
 
 namespace BookStore.order_form
 {
-    public partial class Book_Window_form : Form
+    public partial class customer_form : Form
     {
         #region Fields
         // reference to calling form
@@ -32,7 +32,7 @@ namespace BookStore.order_form
         /// <summary>
         /// default constructor of the form
         /// </summary>
-        public Book_Window_form()
+        public customer_form()
         {
             InitializeComponent();
         }
@@ -44,7 +44,7 @@ namespace BookStore.order_form
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Book_Window_form_Load(object sender, EventArgs e)
+        private void customer_form_Load(object sender, EventArgs e)
         {
             // establish connection to the database and populate combobox
             Connect_DB_and_Populate();
@@ -56,7 +56,7 @@ namespace BookStore.order_form
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Book_Window_form_FormClosing(object sender, FormClosingEventArgs e)
+        private void customer_form_FormClosing(object sender, FormClosingEventArgs e)
         {
             this.RefToForm1.Show();
         }

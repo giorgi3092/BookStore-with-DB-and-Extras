@@ -9,16 +9,45 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
+using MySql.Data.MySqlClient;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Collections;
+using System.Globalization;
 
 namespace BookStore
 {
     public partial class BookStoreForm : Form
     {
         #region Fields
-        /// <summary>
-        /// Stores the books read from book.txt file
-        /// </summary>
+
+        // used for current date to populate database
+        private DateTime today { get; set; }
+
+        // used for current date to populate database
+        private int CurrentCustomerID { get; set; }
+
+        // Stores the books read from book.txt file
         private List<Book> Books = new List<Book>();
+
+        // retrieved books
+        private DataSet RetrievedBooks = new DataSet();
+
+        // Books DB ID storage
+        private ArrayList BookIDStorage { get; set; }
+
+        // Customers DB ID storage
+        private ArrayList CustomerIDStorage { get; set; }
+
+        // retrieved customers
+        private DataSet RetrievedCustomers = new DataSet();
+
+        // reference to calling form
+        public Form RefToForm1 { get; set; }
 
         /// <summary>
         /// Total holds the subtotal amount (QTY*Price)
@@ -52,34 +81,14 @@ namespace BookStore
         const string FILENAMEOUT = "orders.txt";
 
         /// <summary>
-        /// for reading input file book.txt
-        /// </summary>
-        FileStream inFile = null;
-
-        /// <summary>
         /// for writing to the output file orders.txt
         /// </summary>
         FileStream outFile = null;
 
         /// <summary>
-        /// handles reading from a file
-        /// </summary>
-        StreamReader LineReader = null;
-
-        /// <summary>
         /// handles writing to a file
         /// </summary>
         StreamWriter LineWriter = null;
-
-        /// <summary>
-        /// keeps the line read form the book.txt file
-        /// </summary>
-        String LineIn;
-
-        /// <summary>
-        /// for separating "LineIn" array of fields into separate fields for further processing
-        /// </summary>
-        String[] fields;
         #endregion
 
         #region Default Constructor
@@ -97,21 +106,27 @@ namespace BookStore
 
         #region ComboBox Change event-handler
         /// <summary>
-        /// Event handler, envoked when Combobox item is changed
+        /// Event handler, envoked when book Combobox item is changed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void BookList_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            for(int i = 0; i < BookList.Items.Count; i++)
-            {
-                if(BookList.SelectedIndex == i)
-                {
-                    AuthorBox.Text = Books[i].Author;
-                    ISBNBox.Text = Books[i].ISBN;
-                    PriceBox.Text = Books[i].Price.ToString();
-                }
-            }
+            
+            AuthorBox.Text = RetrievedBooks.Tables[0].Rows[BookList.SelectedIndex]["author"].ToString();
+            ISBNBox.Text = RetrievedBooks.Tables[0].Rows[BookList.SelectedIndex]["isbn"].ToString();
+            PriceBox.Text = RetrievedBooks.Tables[0].Rows[BookList.SelectedIndex]["price"].ToString();
+
+        }
+
+        /// <summary>
+        /// Event handler, envoked when customer Combobox item is changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CustomerList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
         #endregion
 
@@ -123,15 +138,11 @@ namespace BookStore
         /// <param name="e"></param>
         private void BookStoreForm_Load(object sender, System.EventArgs e)
         {
-            // open file handlers to read data from book.txt
-            OpenBookFileReader();
+            // establish connection to the database and populate book combobox
+            Connect_DB_and_Populate_Books();
 
-            // loads the books from book.txt into the "Books" arraylist
-            LoadBooks();
-
-            // loads "Books" items into the combobox
-            PopulateComboBox();
-
+            // establish connection to the database and populate customers combobox
+            Connect_DB_and_Populate_Customers();
         }
         #endregion
 
@@ -139,13 +150,13 @@ namespace BookStore
         private void AddToCart_Click(object sender, System.EventArgs e)
         {
 
-            if (BookList.SelectedItem == null)
+            if (BookList.SelectedItem == null || CustomerList.SelectedItem == null)
             {
                 // user has not chosen a book
-                MessageBox.Show("Please choose the book first");
+                MessageBox.Show("Please choose a book and a customer first");
                 BookList.Focus();
             }
-            else if(QuantityBox.Value == 0 && BookList.SelectedItem != null)
+            else if(QuantityBox.Value == 0 && (BookList.SelectedItem != null && CustomerList.SelectedItem != null))
             {
                 // user has not chosen the quantity (it is still 0)
                 MessageBox.Show("Please set \"Quantity\" to a non-zero positive value");
@@ -162,9 +173,14 @@ namespace BookStore
             }
             else
             {
+                string selectedTitle = RetrievedBooks.Tables[0].Rows[BookList.SelectedIndex]["title"].ToString();
+                decimal selectedPrice = decimal.Parse(RetrievedBooks.Tables[0].Rows[BookList.SelectedIndex]["price"].ToString());
+                int selectedCustID =  Convert.ToInt32(CustomerIDStorage[CustomerList.SelectedIndex]);
+                string selectedCustName = RetrievedCustomers.Tables[0].Rows[CustomerList.SelectedIndex]["first_name"].ToString() + " " + RetrievedCustomers.Tables[0].Rows[CustomerList.SelectedIndex]["last_name"].ToString();
+                int selectedBookID = Convert.ToInt32(BookIDStorage[BookList.SelectedIndex]);
 
                 // calculate amount fields
-                SubtotalAmount += Math.Round(QuantityBox.Value * Books[BookList.SelectedIndex].Price, 2);      // calculate subtotal field
+                SubtotalAmount += Math.Round(QuantityBox.Value * selectedPrice, 2);      // calculate subtotal field
                 TaxAmount = Math.Round(0.1m * SubtotalAmount, 2);     //  calculate tax. 10% of SubtotalAmount
                 TotalAmount = SubtotalAmount + TaxAmount;      // calculate the total amount. SubtotalAmount + TaxAmount
 
@@ -172,7 +188,7 @@ namespace BookStore
                 UpdateAmountFields(SubtotalAmount, TaxAmount, TotalAmount);
 
                 // add selected book and QTY to the DataGridView
-                OrderSummarydataGridView.Rows.Add(Books[BookList.SelectedIndex].Title, QuantityBox.Value, "$" + Books[BookList.SelectedIndex].Price, "$" + QuantityBox.Value * Books[BookList.SelectedIndex].Price);
+                OrderSummarydataGridView.Rows.Add(selectedBookID, selectedTitle, QuantityBox.Value, "$" + selectedPrice, "$" + QuantityBox.Value * selectedPrice, selectedCustID, selectedCustName);
             }
         }
         #endregion
@@ -195,8 +211,37 @@ namespace BookStore
                 DialogResult dialogResult = MessageBox.Show("Please confirm your order", "Confirm your order", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    // write the order summary to the orders.txt file within the same directory
-                    WriteOrderSummaryToFile();   
+                    int CurrQty = 0;
+                    int CurrBookID = 0;
+                    int CurrCustID = 0;
+                    decimal CurrSubtotalAmount = 0;
+                    decimal CurrTaxAmount = 0;
+                    decimal CurrTotalAmount = 0;
+                    string tempStr = null;
+                    int MaxOrderID = 0;
+
+
+                    //InsertIntoOrdersTable(CurrCustID, SubtotalAmount, TaxAmount, TotalAmount);
+
+
+                    foreach (DataGridViewRow row in OrderSummarydataGridView.Rows)
+                    {
+                        CurrCustID = Convert.ToInt32(row.Cells["Customer_ID"].Value);
+
+                        tempStr = row.Cells["Price"].Value.ToString();
+                        tempStr = tempStr.Replace("$", "");
+
+                        CurrSubtotalAmount = Convert.ToDecimal(row.Cells["Quantity"].Value) * Convert.ToDecimal(tempStr);
+                        CurrTaxAmount = Math.Round(CurrSubtotalAmount * 0.1m, 2);
+                        CurrTotalAmount = CurrSubtotalAmount + CurrTaxAmount;
+                        CurrBookID = Convert.ToInt32(row.Cells["Book_ID"].Value);
+                        CurrQty = Convert.ToInt32(row.Cells["Quantity"].Value);
+
+                        InsertIntoOrdersTable(CurrCustID, CurrSubtotalAmount, CurrTaxAmount, CurrTotalAmount);
+                        MaxOrderID = MAX_ID_FROM_ORDER_TABLE();
+                        InsertIntoOrderDetailsTable(MaxOrderID, CurrBookID, CurrQty, CurrSubtotalAmount);
+                    }
+                    
                 }
                 else if (dialogResult == DialogResult.No)
                 {
@@ -236,6 +281,146 @@ namespace BookStore
         #endregion
 
         #region Helper Functions
+        private void Connect_DB_and_Populate_Books()
+        {
+
+            try
+            {
+                string con_string = "datasource = localhost; username = root; password =; database=bookstore";
+                MySqlConnection db_con = new MySqlConnection(con_string);
+                MySqlDataAdapter da = new MySqlDataAdapter("select * from books ORDER BY book_id ASC", db_con);
+                db_con.Open();
+                BookIDStorage = new ArrayList();
+                da.Fill(RetrievedBooks, "books");
+                for (int i = 0; i < RetrievedBooks.Tables[0].Rows.Count; i++)
+                {
+                    BookList.Items.Add(RetrievedBooks.Tables[0].Rows[i]["title"].ToString());
+                    BookIDStorage.Add(RetrievedBooks.Tables[0].Rows[i]["book_id"].ToString());
+                }
+                db_con.Close();
+            }
+
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// used to populate combobox in this form from database with "books" table
+        /// </summary>
+        private void Connect_DB_and_Populate_Customers()
+        {
+            try
+            {
+                string con_string = "datasource = localhost; username = root; password =; database=bookstore";
+                MySqlConnection db_con = new MySqlConnection(con_string);
+                MySqlDataAdapter da = new MySqlDataAdapter("select * from customer ORDER BY customer_id ASC", db_con);
+                db_con.Open();
+                CustomerIDStorage = new ArrayList();
+                da.Fill(RetrievedCustomers, "customer");
+                for (int i = 0; i < RetrievedCustomers.Tables[0].Rows.Count; i++)
+                {
+                    CustomerList.Items.Add(RetrievedCustomers.Tables[0].Rows[i]["first_name"].ToString() + " " + RetrievedCustomers.Tables[0].Rows[i]["last_name"].ToString());
+                    CustomerIDStorage.Add(RetrievedCustomers.Tables[0].Rows[i]["customer_id"].ToString());
+                }
+                db_con.Close();
+            }
+
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// returns the latest ID of the entry into the orders table
+        /// </summary>
+        private int MAX_ID_FROM_ORDER_TABLE()
+        {
+            int max_id = 0;
+            try
+            {
+                string con_string = "datasource = localhost; username = root; password =; database=bookstore";
+                MySqlConnection db_con = new MySqlConnection(con_string);
+                MySqlDataAdapter da = new MySqlDataAdapter("SELECT MAX(order_id) FROM orders;", db_con);
+                db_con.Open();
+                DataSet ds = new DataSet();
+                da.Fill(ds, "orders");
+                max_id = Convert.ToInt32(ds.Tables[0].Rows[0]["MAX(order_id)"].ToString());
+                db_con.Close();
+            }
+
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+
+            return max_id;
+        }
+
+
+        /// <summary>
+        /// Inserts into orders table
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="author"></param>
+        /// <param name="isbn"></param>
+        /// <param name="price"></param>
+        private void InsertIntoOrdersTable(int customer_id, decimal sub_total, decimal tax, decimal total)
+        {
+            try
+            {
+                string MyConnection3 = "datasource=localhost;username=root;passwor=;database=bookstore";
+                string Query = @"INSERT INTO orders(customer_id, sub_total, tax, total, order_date) VALUES ('" + customer_id + @"', '" + sub_total + @"', '" + tax + @"', '" + total + @"',  '" + DateTime.Now.ToString("yyyy-MM-dd") + @"');";
+                MySqlConnection MyConn2 = new MySqlConnection(MyConnection3);
+                MySqlCommand MyCommand2 = new MySqlCommand(Query, MyConn2);
+                MyConn2.Open();
+                MySqlDataReader MyReader2;
+                MyReader2 = MyCommand2.ExecuteReader();
+                // MessageBox.Show("Data Deleted");
+                while (MyReader2.Read())
+                {
+                }
+                MyConn2.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Inserts into order_details table
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="author"></param>
+        /// <param name="isbn"></param>
+        /// <param name="price"></param>
+        private void InsertIntoOrderDetailsTable(int order_id, int book_id, int qty_of_books, decimal line_total_per_book)
+        {
+            try
+            {
+                string MyConnection3 = "datasource=localhost;username=root;passwor=;database=bookstore";
+                string Query = @"INSERT INTO order_details(order_id, book_id, qty_of_books, line_total_per_book) VALUES (" + order_id + @", " + book_id + @", " + qty_of_books + @", " + line_total_per_book + @");";
+                MySqlConnection MyConn2 = new MySqlConnection(MyConnection3);
+                MySqlCommand MyCommand2 = new MySqlCommand(Query, MyConn2);
+                MyConn2.Open();
+                MySqlDataReader MyReader2;
+                MyReader2 = MyCommand2.ExecuteReader();
+                // MessageBox.Show("Data Deleted");
+                while (MyReader2.Read())
+                {
+                }
+                MyConn2.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         /// <summary>
         /// Updates the amount text boxes: Subtotal, Tax, Total
         /// </summary>
@@ -248,89 +433,7 @@ namespace BookStore
             TaxBox.Text = "$" + TaxAmount;
             TotalBox.Text = "$" + TotalAmount;
         }
-
-        /// <summary>
-        /// loads the books into the Books arraylist
-        /// </summary>
-        private void LoadBooks()
-        {
-            // read the first line from book.txt
-            LineIn = LineReader.ReadLine();
-
-            // while valid records are read from the book.txt file, continue parsing and processing them
-            // also add the books into the combobox
-            while (LineIn != null)
-            {
-                // create a new Book object
-                Book TempBook = new Book();
-
-                try
-                {
-                    // parse the line from book.txt into multiple Array items
-                    fields = LineIn.Split(DELIM);
-                }
-                catch(OutOfMemoryException)
-                {
-                    LineReader.Close();
-                    inFile.Close();
-                    
-                    MessageBox.Show("Your computer is out of memory. Probably, the book.txt is not correctly formatted.");
-                }
-
-                // assign the read data to the TempBook's fields
-                TempBook.Author = fields[0];
-                TempBook.ISBN = fields[1];
-                TempBook.Price = Convert.ToDecimal(fields[2]);
-                TempBook.Title = fields[3];
-
-                // add the TempBook to the BookList
-                Books.Add(TempBook);
-
-                // read the next line of book.txt
-                LineIn = LineReader.ReadLine();
-            }
-        }
-
-        /// <summary>
-        /// opens a file for reading later
-        /// </summary>
-        private void OpenBookFileReader()
-        {
-            try
-            {
-                // open book.txt file for reading
-                inFile = new FileStream(FILENAMEIN, FileMode.Open, FileAccess.Read);
-            }
-            catch (FileNotFoundException e)
-            {
-                MessageBox.Show($"Sorry, we searched high and low but couldn't find \"{e.FileName}\" file");
-            }
-            catch (Exception)
-            {
-                MessageBox.Show($"Sorry, something went really bad while accessing \"book.txt\" in the program's current directory");
-            }
-
-            try
-            {
-                LineReader = new StreamReader(inFile);
-            } 
-            catch(IOException)
-            {
-                MessageBox.Show($"Sorry, something went wrong with the file");
-            }
-            
-        }
-
-        /// <summary>
-        /// populates the combobox with the items of the "Books" arraylist
-        /// </summary>
-        private void PopulateComboBox()
-        {
-            for (int i = 0; i < Books.Count; i++)
-            {
-                BookList.Items.Add(Books[i].Title);
-            }
-        }
+       
 
         /// <summary>
         /// handles writing the order summary to the orders.txt file within the same directory
@@ -406,5 +509,17 @@ namespace BookStore
             outFile.Close();
         }
         #endregion
+
+        /// <summary>
+        /// handles opening the parent form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BookStoreForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.RefToForm1.Show();
+        }
+
+
     }
 }
